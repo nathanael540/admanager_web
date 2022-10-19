@@ -1,0 +1,19 @@
+name: admanager_web
+description: Simple plugin to display ads from AdManager in Flutter Web
+version: 0.0.1
+homepage: https://github.com/nathanael540/admanager_web
+
+environment:
+  sdk: ">=2.18.1 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
