@@ -7,6 +7,7 @@ Simple package that allow us display ads from Ad Manager in Flutter Web. This wa
 - Load GPT.js Library from DoubleClick Servers
 - Request ads from Ad Manager Network
 - Can run Adsense ads in a Flutter Web App
+- [Preview here](https://htmlpreview.github.io/?https://github.com/nathanael540/admanager_web/blob/main/example/build/web/index.html)
 
 ## Usage
 
@@ -30,7 +31,7 @@ Just add the AdBlock widget to show the ad where you like:
 [...]
  AdBlock(
      size: AdBlockSize.largeRectangle,
-     adUnitId: "/6355419/Travel/Europe", 
+     adUnitId: "/6355419/Travel/Europe",
  )
 [...]
 ```
@@ -38,3 +39,8 @@ Just add the AdBlock widget to show the ad where you like:
 ## Additional information
 
 This package was made in order to show Google Adsense ads on Flutter Web in a simple way. Its still in its infancy, and any help to make it better and more efficient will be appreciated.
+
+## Made with ♥ from Brazil 🇧🇷
+
+It was made in Brazil by Nathanael Ferreira. A young man who is always open to cool job opportunities.
+contato@solion-web.com
