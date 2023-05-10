@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3
+
+- Fix size from View Factory
+
 ## 0.0.2
 
 - Check if the GPT.js Library is already loaded

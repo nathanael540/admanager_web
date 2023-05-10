@@ -45,8 +45,8 @@ class _AdBlockState extends State<AdBlock> {
     ui.platformViewRegistry.registerViewFactory("gam_$blockId", (int viewId) {
       var div = DivElement()..id = blockId;
 
-      div.style.width = "100%";
-      div.style.height = "100%";
+      div.style.width = "${widget.size[0].width}px";
+      div.style.height = "${widget.size[0].height}px";
 
       return div;
     });
@@ -92,8 +92,8 @@ class _AdBlockState extends State<AdBlock> {
               }
             },
             child: SizedBox(
-              height: height ?? 10,
-              width: width ?? double.infinity,
+              height: height ?? widget.size[0].height.toDouble(),
+              width: width ?? widget.size[0].width.toDouble(),
               child: HtmlElementView(
                 viewType: "gam_$blockId",
                 onPlatformViewCreated: (id) {},
