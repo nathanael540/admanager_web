@@ -1,63 +1,104 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
-import 'dart:math';
 import 'package:flutter/material.dart';
+import "package:universal_html/html.dart";
+import 'package:universal_html/js.dart' as js;
+import 'package:visibility_detector/visibility_detector.dart';
 import 'dart:ui' as ui;
-import 'dart:html' as html;
-import 'dart:js' as js;
 
 import 'adblocksize.dart';
 
-/// A widget that displays an Ad from AdManager in a Flutter Web app
-///
-/// This widget will create one [SizedBox] with the size of the ad and will
-/// display the ad inside it using the GPT.js library from Google
-///
-class AdBlock extends StatelessWidget {
-  /// The size that will be used to request the ad
-  final AdBlockSize size;
+/// Widget that displays an Ad from AdManager
+class AdBlock extends StatefulWidget {
+  final List<AdBlockSize> size;
 
   /// The ad unit code from AdManager Panel
+  /// Example: /1234567/my-ad (where 1234567 is the network code and my-ad is the ad unit code)
   final String? adUnitId;
 
-  /// Custom Random Id for our div that will load the ad
-  final String blockId = "ad_${Random().nextInt(999999).toRadixString(36)}";
+  const AdBlock({super.key, required this.size, required this.adUnitId});
 
-  /// The constructor for our widget
-  AdBlock({super.key, required this.size, required this.adUnitId}) {
-    /// We create a DivElement to hold our ad ;)
-    ui.platformViewRegistry.registerViewFactory("admanager_$blockId",
-        (int viewId) {
-      var div = html.DivElement()..id = blockId;
+  @override
+  State<AdBlock> createState() => _AdBlockState();
+}
 
-      // TODO: Allow more sizes, like responsive ads ["fluid"]
+class _AdBlockState extends State<AdBlock> {
+  String blockId = "";
+  double? width;
+  double? height;
+  bool isEmpty = false;
+  bool hasLoaded = false;
 
-      div.style.width = "${size.width}px";
-      div.style.height = "${size.height}px";
+  @override
+  void initState() {
+    super.initState();
 
-      // TODO: Add a eventListener to check if the ad was loaded
+    String counter = window.localStorage['GAM_counter'] ?? '0';
+    window.localStorage['GAM_counter'] = (int.parse(counter) + 1).toString();
+    blockId = "ad_$counter";
+
+    // Listen to messages from the page
+    window.addEventListener('gam_slot_render', _renderListener);
+
+    _createView();
+  }
+
+  void _createView() {
+    ui.platformViewRegistry.registerViewFactory("gam_$blockId", (int viewId) {
+      var div = DivElement()..id = blockId;
+
+      div.style.width = "100%";
+      div.style.height = "100%";
 
       return div;
     });
   }
 
+  void _loadAd() {
+    List<String> sizes =
+        widget.size.map((e) => "${e.width}x${e.height}").toList();
+
+    js.context.callMethod(
+      'adManagerPluginDisplay',
+      [blockId, widget.adUnitId, sizes.join("|")],
+    );
+
+    hasLoaded = true;
+  }
+
+  _renderListener(Event event) {
+    if (event is CustomEvent) {
+      var detail = event.detail;
+
+      if (detail['blockId'] == blockId) {
+        setState(() {
+          isEmpty = detail['isEmpty'];
+          if (!isEmpty) {
+            width = detail['size'][0];
+            height = detail['size'][1];
+          }
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    /// We create a SizedBox with the size of the ad
-    return SizedBox(
-      height: size.height.toDouble(),
-      width: size.width.toDouble(),
-      child: HtmlElementView(
-        viewType: "admanager_$blockId",
-        onPlatformViewCreated: (id) {
-          /// Its call our function to load the ad from AdManager using GPT.js
-          js.context.callMethod('adManagerPluginDisplay', [
-            blockId,
-            adUnitId,
-            size.width,
-            size.height,
-          ]);
-        },
-      ),
-    );
+    return isEmpty && hasLoaded
+        ? const SizedBox.shrink()
+        : VisibilityDetector(
+            key: Key(blockId),
+            onVisibilityChanged: (visibilityInfo) {
+              if (visibilityInfo.visibleFraction > 0 && !hasLoaded) {
+                _loadAd();
+              }
+            },
+            child: SizedBox(
+              height: height ?? 10,
+              width: width ?? double.infinity,
+              child: HtmlElementView(
+                viewType: "gam_$blockId",
+                onPlatformViewCreated: (id) {},
+              ),
+            ),
+          );
   }
 }

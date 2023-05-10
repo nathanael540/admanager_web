@@ -62,6 +62,15 @@ class _MyHomePageState extends State<MyHomePage> {
       "Prosciutto occaecat laborum flank nisi pork loin est tongue officia lorem jerky andouille drumstick cow do.  Quis boudin pastrami tail nostrud cow ball tip buffalo pork salami shoulder enim rump nisi.  Sunt ut pork belly anim, et ut meatball do fatback ad nostrud porchetta.  Prosciutto meatball chislic excepteur nisi salami fatback lorem capicola cillum.  Aute biltong alcatra, minim do non andouille ad tail occaecat ham hock mollit beef ribs.  Voluptate sausage cupim do jerky id.  Ball tip tempor pork belly, nisi esse cupidatat fatback dolor quis prosciutto occaecat porchetta pig reprehenderit."
     ];
 
+    // Add Ad from AdManager using the AdManager package
+    newContent.add(const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: AdBlock(
+        size: [AdBlockSize.mediumRectangle],
+        adUnitId: "/6355419/Travel/Europe",
+      ),
+    ));
+
     // Add lorem text
     newContent.add(
       Padding(
@@ -71,10 +80,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     // Add Ad from AdManager using the AdManager package
-    newContent.add(Padding(
-      padding: const EdgeInsets.all(8.0),
+    newContent.add(const Padding(
+      padding: EdgeInsets.all(8.0),
       child: AdBlock(
-        size: AdBlockSize.mediumRectangle,
+        size: [AdBlockSize.mediumRectangle],
         adUnitId: "/6355419/Travel/Europe",
       ),
     ));
