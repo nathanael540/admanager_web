@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4
+
+- Add support to AdManager Rewarded Ads
+
 ## 0.0.3
 
 - Fix size from View Factory
