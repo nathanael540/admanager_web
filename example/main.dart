@@ -38,10 +38,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _adRewarded = AdRewarded();
+  bool _adRewardedReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadRewarded();
+    });
+  }
+
   List<Widget> content = [
-    Row(
+    const Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
+      children: [
         Padding(
           padding: EdgeInsets.all(8.0),
           child: Text("Click + button to add content and AD example"),
@@ -49,6 +61,41 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
     )
   ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: content,
+        ),
+      ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (_adRewardedReady)
+            FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.green,
+              onPressed: _askRewarded,
+              tooltip: 'Rewarded Ad',
+              child: const Icon(Icons.attach_money),
+            ),
+          const SizedBox(height: 8),
+          FloatingActionButton(
+            onPressed: _addMoreContent,
+            tooltip: 'Add Content',
+            child: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _addMoreContent() {
     List<Widget> newContent = [];
@@ -93,23 +140,66 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: content,
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addMoreContent,
-        tooltip: 'Add Content',
-        child: const Icon(Icons.add),
-      ),
+  void _askRewarded() {
+    setState(() {
+      _adRewardedReady = false;
+    });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Rewarded Ad"),
+          content: const Text("Do you want to watch a rewarded ad?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+                _adRewarded.show(
+                  onAdClosed: loadRewarded,
+                  onGranted: grantReward,
+                );
+              },
+              child: const Text("Yes"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void loadRewarded() {
+    _adRewarded.load(
+      adUnitId: '/22639388115/rewarded_web_example',
+      onAdLoaded: () => setState(() {
+        _adRewardedReady = true;
+      }),
+    );
+  }
+
+  void grantReward(int amount) {
+    loadRewarded();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Rewarded Ad"),
+          content: Text("You got $amount"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

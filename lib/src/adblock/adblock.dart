@@ -4,7 +4,7 @@ import 'package:universal_html/js.dart' as js;
 import 'package:visibility_detector/visibility_detector.dart';
 import 'dart:ui' as ui;
 
-import 'adblocksize.dart';
+import 'adblock_size.dart';
 
 /// Widget that displays an Ad from AdManager
 class AdBlock extends StatefulWidget {
@@ -53,8 +53,7 @@ class _AdBlockState extends State<AdBlock> {
   }
 
   void _loadAd() {
-    List<String> sizes =
-        widget.size.map((e) => "${e.width}x${e.height}").toList();
+    List<String> sizes = widget.size.map((e) => "${e.width}x${e.height}").toList();
 
     js.context.callMethod(
       'adManagerPluginDisplay',

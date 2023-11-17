@@ -6,7 +6,6 @@ Simple package that allow us display ads from Ad Manager in Flutter Web. This wa
 
 - Request ad from Ad Manager Network
 - Can run Adsense ad in a Flutter Web App
-- [Preview here](https://solion.app/web/)
 
 ## Usage
 
@@ -35,17 +34,41 @@ Just add the AdBlock widget to show the ad where you like:
 [...]
 ```
 
+Load Rewarded Ad:
+
+```dart
+[...]
+ AdRewarded().load(
+    adUnitId: '/22639388115/rewarded_web_example',
+    onAdLoaded: (){},
+ )
+[...]
+```
+
+Show Rewarded Ad:
+
+```dart
+[...]
+ AdRewarded().show(
+    onAdClosed: (){},
+    onGranted: (int amount){},
+ );
+[...]
+```
+
 ## Additional information
 
 For more performance add the GPT.js Library directly in your head in index.html file:
 
 ```html
-<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+<script
+  async
+  src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"
+></script>
 ```
 
 This package was made in order to show Google Adsense ads on Flutter Web in a simple way. Its still in its infancy, and any help to make it better and more efficient will be appreciated.
 
 ## Made with ♥ from Brazil 🇧🇷
 
-It was made in Brazil by Nathanael Ferreira. A young man who is always open to cool job opportunities.
-contato@solion-web.com
+It was made in Brazil by Nathanael Ferreira.
