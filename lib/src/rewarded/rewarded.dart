@@ -1,4 +1,5 @@
 import "package:universal_html/html.dart";
+import 'package:flutter/foundation.dart';
 import "package:universal_html/js.dart" as js;
 
 class AdRewarded {
@@ -17,6 +18,9 @@ class AdRewarded {
   bool get adLoaded => _adLoaded;
 
   void listen() {
+     if (kIsWeb == false) {
+      return;
+    }
     window.addEventListener('gam_slot_rewarded_ready', (event) {
       _adLoaded = true;
       if (_onAdLoaded != null) _onAdLoaded!();
@@ -29,7 +33,7 @@ class AdRewarded {
 
     window.addEventListener('gam_slot_rewarded_granted', (Event event) {
       if (event is CustomEvent) {
-        var detail = event.detail;
+        var detail = event.detail as Map;
         if (detail['amount'] != null) {
           if (_onGranted != null) _onGranted!(detail['amount']);
         }
@@ -39,11 +43,17 @@ class AdRewarded {
   }
 
   void load({required String adUnitId, Function? onAdLoaded}) {
+    if (kIsWeb == false) {
+      return;
+    }
     _onAdLoaded = onAdLoaded;
     js.context.callMethod('adManagerPluginLoadRewarded', [adUnitId]);
   }
 
   void show({Function? onAdClosed, Function(int)? onGranted}) {
+    if (kIsWeb == false) {
+      return;
+    }
     if (!_adLoaded) return;
 
     _onAdClosed = onAdClosed;
