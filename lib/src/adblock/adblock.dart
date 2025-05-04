@@ -2,9 +2,21 @@ import 'package:flutter/material.dart';
 import "package:universal_html/html.dart";
 import 'package:universal_html/js.dart' as js;
 import 'package:visibility_detector/visibility_detector.dart';
-import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
+import '../platform_view_registry.dart';
+
+
+
 
 import 'adblock_size.dart';
+
+
+class FakePlatformViewRegistry {
+  void registerViewFactory(
+      String viewTypeId, dynamic Function(int) viewFactory) {
+         throw UnsupportedError("platform view registry in non-web context");
+      }
+}
 
 /// Widget that displays an Ad from AdManager
 class AdBlock extends StatefulWidget {
@@ -30,6 +42,9 @@ class _AdBlockState extends State<AdBlock> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb == false) {
+      return;
+    }
 
     String counter = window.localStorage['GAM_counter'] ?? '0';
     window.localStorage['GAM_counter'] = (int.parse(counter) + 1).toString();
@@ -42,7 +57,11 @@ class _AdBlockState extends State<AdBlock> {
   }
 
   void _createView() {
-    ui.platformViewRegistry.registerViewFactory("gam_$blockId", (int viewId) {
+    if (kIsWeb == false) {
+      return;
+    }
+
+    plataformFake.registerViewFactory("gam_$blockId", (int viewId) {
       var div = DivElement()..id = blockId;
 
       div.style.width = "${widget.size[0].width}px";
@@ -53,19 +72,27 @@ class _AdBlockState extends State<AdBlock> {
   }
 
   void _loadAd() {
-    List<String> sizes = widget.size.map((e) => "${e.width}x${e.height}").toList();
+    if (kIsWeb == false) {
+      return;
+    }
+    List<String> sizes =
+        widget.size.map((e) => "${e.width}x${e.height}").toList();
 
-    js.context.callMethod(
-      'adManagerPluginDisplay',
-      [blockId, widget.adUnitId, sizes.join("|")],
-    );
+    js.context.callMethod('adManagerPluginDisplay', [
+      blockId,
+      widget.adUnitId,
+      sizes.join("|"),
+    ]);
 
     hasLoaded = true;
   }
 
   _renderListener(Event event) {
+    if (kIsWeb == false) {
+      return;
+    }
     if (event is CustomEvent) {
-      var detail = event.detail;
+      var detail = event.detail as Map;
 
       if (detail['blockId'] == blockId) {
         setState(() {
@@ -84,20 +111,20 @@ class _AdBlockState extends State<AdBlock> {
     return isEmpty && hasLoaded
         ? const SizedBox.shrink()
         : VisibilityDetector(
-            key: Key(blockId),
-            onVisibilityChanged: (visibilityInfo) {
-              if (visibilityInfo.visibleFraction > 0 && !hasLoaded) {
-                _loadAd();
-              }
-            },
-            child: SizedBox(
-              height: height ?? widget.size[0].height.toDouble(),
-              width: width ?? widget.size[0].width.toDouble(),
-              child: HtmlElementView(
-                viewType: "gam_$blockId",
-                onPlatformViewCreated: (id) {},
-              ),
+          key: Key(blockId),
+          onVisibilityChanged: (visibilityInfo) {
+            if (visibilityInfo.visibleFraction > 0 && !hasLoaded) {
+              _loadAd();
+            }
+          },
+          child: SizedBox(
+            height: height ?? widget.size[0].height.toDouble(),
+            width: width ?? widget.size[0].width.toDouble(),
+            child: HtmlElementView(
+              viewType: "gam_$blockId",
+              onPlatformViewCreated: (id) {},
             ),
-          );
+          ),
+        );
   }
 }
