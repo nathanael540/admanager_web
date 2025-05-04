@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5
+
+- Fix issues when building for non-web platforms
+
 ## 0.0.4
 
 - Add support to AdManager Rewarded Ads
